@@ -1,46 +1,42 @@
-import os
-from scripts.load_data import load_excel, load_csv
-from scripts.clean_data import clean_column_names, convert_dates
-from scripts.save_data import save_to_csv
-
-# Define paths
-raw_dir = os.path.join("data", "raw")
-processed_dir = os.path.join("data", "processed")
-
-# -------- Bank Stability --------
-bank_file = "357447032_Depository Corporation Survey.csv"
-df_bank = load_csv(os.path.join(raw_dir, bank_file))
-df_bank = clean_column_names(df_bank)
-df_bank = df_bank.dropna() #Removes rows with any missing values
-#OR
-#fillna(value=0)-filling missing values with zero
-df_bank = df_bank.fillna(value= 0)
-df_bank = convert_dates(df_bank, "date")  # change column if needed
-save_to_csv(df_bank, os.path.join(processed_dir, "clean_bank_data.csv"))
-
-# -------- Customer Risk Mapping --------
-finaccess_file = "2024_Finaccess_Publicdata.xlsx"
-df_fin = load_excel(os.path.join(raw_dir, finaccess_file))
-df_fin = df_fin = clean_column_names(df_fin)
-df_fin = df_fin.dropna() 
-df_fin = df_fin.fillna ( method= "ffill" )# Removes rows with any missing values
-    # OR
-    # Example: Forward fill missing values
-save_to_csv(df_fin, os.path.join(processed_dir, "clean_finaccess_data.csv"))
-
-# -------- Economic Indicators --------
-econ_file = "Monthly Economic Indicators.xlsx"
-df_econ = load_excel(os.path.join(raw_dir, econ_file))
-df_econ = clean_column_names(df_econ)
-df_econ = convert_dates(df_econ, "date")
-df_econ = df_econ.fillna(df_econ.mean())# filling issing values with column mean
-#OR
-df_econ = df_econ.dropna (subset=["specific_column"])#Drops rows with missing values in a specific column
-save_to_csv(df_econ, os.path.join(processed_dir, "clean_economic_indicators.csv"))
-
+from scripts.load_data import load_all_data
 import pandas as pd
-df1 = pd.read_csv ("file1.csv")
-df2 = pd.read_csv ("file2.csv")
-df3 = pd.read_csv ("file3.csv")
-combined_df = pd.concat ([df1, df2, df3])
-combined_df.to_csv("C:/Users/USER/OneDrive/Desktop/Kenyan_Bank_Analysis/data/processed/combined_data.csv", index=False)
+import os
+
+# Load data using your custom loader
+bank1, bank2, customer_risk, inflation, inflation_effectors = load_all_data()
+
+# Merge Bank Stability 1 & 2
+merged_bank = pd.merge(bank1, bank2, on=["Year", "Month"], how="outer")
+merged_bank["Bank_Stability_Score"] = merged_bank[["Factors Affecting Bank Stability", "MONTHS PER YEAR"]].mean(axis=1)
+
+# Aggregate Customer Risk (Kenya-wide average per month/year)
+customer_summary = customer_risk.groupby(["Year", "Month"]).agg({
+    "Risk_Score": "mean"
+}).reset_index()
+
+customer_summary["Risk_Category"] = pd.cut(customer_summary["Risk_Score"],
+                                           bins=[0, 0.3, 0.7, 1.0],
+                                           labels=["Low", "Medium", "High"])
+
+# Merge Inflation Data with Effectors
+inflation_full = pd.merge(inflation, inflation_effectors, on=["Year"], how="left")
+
+# Merge all data together
+step1 = pd.merge(merged_bank, customer_summary, on=["Year", "Month"], how="left")
+final_data = pd.merge(step1, inflation_full, on=["Year", "Month"], how="left")
+
+# Optional: Add calculated insights
+final_data["Risk_to_Stability_Ratio"] = final_data["Risk_Score"] / final_data["Bank_Stability_Score"]
+
+#  Make sure the 'processed' folder exists
+os.makedirs("processed", exist_ok=True)
+
+#  Save the processed data
+final_data.to_csv("processed/ProcessedBankAnalysis.csv", index=False)
+
+# Print confirmation and data preview
+print(" File saved successfully at: processed/ProcessedBankAnalysis.csv")
+print("Shape:", final_data.shape)
+print(final_data.head(10))
+
+print("Processing complete! Data saved to 'processed/Processed_Bank_Analysis.csv'")

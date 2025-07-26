@@ -20,11 +20,11 @@ def load_all_data(raw_data_folder="data/raw"):
     file_inflation_affectors = os.path.join(raw_data_folder, "Inflation_Affectors_Statistics.csv")
 
     # Load CSV files into pandas DataFrames
-    df_bank1 = pd.read_csv(file_bank1)
-    df_bank2 = pd.read_csv(file_bank2)
-    df_customer_risk = pd.read_csv(file_customer_risk)
-    df_inflation_rates = pd.read_csv(file_inflation_rates)
-    df_inflation_affectors = pd.read_csv(file_inflation_affectors)
+    df_bank1 = pd.read_csv(file_bank1,encoding='ISO-8859-1')
+    df_bank2 = pd.read_csv(file_bank2,encoding='ISO-8859-1')
+    df_customer_risk = pd.read_csv(file_customer_risk,encoding='ISO-8859-1')
+    df_inflation_rates = pd.read_csv(file_inflation_rates,encoding='ISO-8859-1')
+    df_inflation_affectors = pd.read_csv(file_inflation_affectors,encoding='ISO-8859-1')
 
     # Return as a dictionary for organized access
     return {

@@ -1,29 +1,48 @@
 from scripts.load_data import load_all_data
 import pandas as pd
 import os
+import pandas as pd
 
-# Load data using your custom loader
-bank1, bank2, customer_risk, inflation, inflation_effectors = load_all_data()
+# Step 1: Load Data
+bank1 = pd.read_csv("Bank_Stability_1.csv")
+bank2 = pd.read_csv("Bank_Stability_2.csv")
+monthly_factors = pd.read_csv("Factors_Bank_Monthly.csv")
+inflation = pd.read_csv("Inflation_Rates.csv")
+annual_factors = pd.read_csv("Inflation_Annual_Factors.csv")
 
-# Merge Bank Stability 1 & 2
-merged_bank = pd.merge(bank1, bank2, on=["Year", "Month"], how="outer")
-merged_bank["Bank_Stability_Score"] = merged_bank[["Factors Affecting Bank Stability", "MONTHS PER YEAR"]].mean(axis=1)
+# Step 2: Combine Bank Stability (assume same columns)
+bank_combined = pd.concat([bank1, bank2], ignore_index=True)
 
-# Aggregate Customer Risk (Kenya-wide average per month/year)
-customer_summary = customer_risk.groupby(["Year", "Month"]).agg({
-    "Risk_Score": "mean"
-}).reset_index()
+# Step 3: Merge Bank Stability with Monthly Factors
+bank_with_factors = pd.merge(
+    bank_combined,
+    monthly_factors,
+    on=["Year", "Month"],
+    how="left"
+)
 
-customer_summary["Risk_Category"] = pd.cut(customer_summary["Risk_Score"],
-                                           bins=[0, 0.3, 0.7, 1.0],
-                                           labels=["Low", "Medium", "High"])
+# Step 4: Merge with Monthly Inflation
+bank_with_inflation = pd.merge(
+    bank_with_factors,
+    inflation,
+    on=["Year", "Month"],
+    how="left"
+)
 
-# Merge Inflation Data with Effectors
-inflation_full = pd.merge(inflation, inflation_effectors, on=["Year"], how="left")
+# Step 5: Merge with Annual Inflation Factors
+final_merged = pd.merge(
+    bank_with_inflation,
+    annual_factors,
+    on="Year",
+    how="left"
+)
 
-# Merge all data together
-step1 = pd.merge(merged_bank, customer_summary, on=["Year", "Month"], how="left")
-final_data = pd.merge(step1, inflation_full, on=["Year", "Month"], how="left")
+# Step 6: Save the processed dataset
+final_merged.to_csv("Processed_Bank_Stability_Data.csv", index=False)
+
+# Optional: Show a quick summary
+print("Final dataset shape:", final_merged.shape)
+print(final_merged.head())
 
 # Optional: Add calculated insights
 final_data["Risk_to_Stability_Ratio"] = final_data["Risk_Score"] / final_data["Bank_Stability_Score"]

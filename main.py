@@ -4,11 +4,11 @@ import os
 import pandas as pd
 
 # Step 1: Load Data
-bank1 = pd.read_csv("Bank_Stability_1.csv")
-bank2 = pd.read_csv("Bank_Stability_2.csv")
-monthly_factors = pd.read_csv("Factors_Bank_Monthly.csv")
-inflation = pd.read_csv("Inflation_Rates.csv")
-annual_factors = pd.read_csv("Inflation_Annual_Factors.csv")
+bank1 = pd.read_csv(r"C:\Users\USER\OneDrive\Desktop\Kenyan_Bank_Analysis\data\raw\Bank_Stability_Analysis.csv")
+bank2 = pd.read_csv(r"C:\Users\USER\OneDrive\Desktop\Kenyan_Bank_Analysis\data\raw\Bank_Stability_Analysis2.csv")
+monthly_factors = pd.read_csv(r"C:\Users\USER\OneDrive\Desktop\Kenyan_Bank_Analysis\data\raw\Customer_Risk_Mapping_Statistics.xlsx")
+inflation = pd.read_csv(r"C:\Users\USER\OneDrive\Desktop\Kenyan_Bank_Analysis\data\raw\Inflation Rates.csv")
+annual_factors = pd.read_csv(r"C:\Users\USER\OneDrive\Desktop\Kenyan_Bank_Analysis\data\raw\inflation_affectors_statistics.csv")
 
 # Step 2: Combine Bank Stability (assume same columns)
 bank_combined = pd.concat([bank1, bank2], ignore_index=True)

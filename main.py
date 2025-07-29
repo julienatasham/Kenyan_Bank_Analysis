@@ -4,40 +4,33 @@ import os
 import pandas as pd
 
 # Step 1: Load Data
-bank1 = pd.read_csv(r"C:\Users\USER\OneDrive\Desktop\Kenyan_Bank_Analysis\data\raw\Bank_Stability_Analysis.csv")
-bank2 = pd.read_csv(r"C:\Users\USER\OneDrive\Desktop\Kenyan_Bank_Analysis\data\raw\Bank_Stability_Analysis2.csv")
-monthly_factors = pd.read_csv(r"C:\Users\USER\OneDrive\Desktop\Kenyan_Bank_Analysis\data\raw\Customer_Risk_Mapping_Statistics.xlsx")
-inflation = pd.read_csv(r"C:\Users\USER\OneDrive\Desktop\Kenyan_Bank_Analysis\data\raw\Inflation Rates.csv")
-annual_factors = pd.read_csv(r"C:\Users\USER\OneDrive\Desktop\Kenyan_Bank_Analysis\data\raw\inflation_affectors_statistics.csv")
+bank1 = pd.read_csv(r"C:\\Users\USER\\OneDrive\\Desktop\Kenyan_Bank_Analysis\\data\\raw\\Bank_Stability_Analysis.csv" ,encoding='ISO-8859-1')
+bank2 = pd.read_csv(r"C:\\Users\\USER\OneDrive\\Desktop\\Kenyan_Bank_Analysis\\data\raw\\Bank_Stability_Analysis2.csv" ,encoding='ISO-8859-1')
+customer_risk = pd.read_csv(r"C:\\Users\USER\\OneDrive\\Desktop\Kenyan_Bank_Analysis\\data\\raw\\Customer_Risk_Mapping_Statistics.xlsx" ,encoding='ISO-8859-1')
+inflation_rates = pd.read_csv(r"C:\\Users\USER\\OneDrive\\Desktop\\Kenyan_Bank_Analysis\\data\\raw\\Inflation Rates.csv", encoding='ISO-8859-1')
+inflation_affectors = pd.read_csv(r"C:\\Users\\USER\\OneDrive\\Desktop\\Kenyan_Bank_Analysis\\data\\raw\\inflation_affectors_statistics.csv" ,encoding='ISO-8859-1')
 
 # Step 2: Combine Bank Stability (assume same columns)
 bank_combined = pd.concat([bank1, bank2], ignore_index=True)
+bank_combined = bank_combined.drop_duplicates (subset=['Year','Factors_affecting_bank_stability']keep='first' inplace=True)
 
-# Step 3: Merge Bank Stability with Monthly Factors
-bank_with_factors = pd.merge(
-    bank_combined,
-    monthly_factors,
-    on=["Year", "Month"],
-    how="left"
-)
-
-# Step 4: Merge with Monthly Inflation
+#Step 3
 bank_with_inflation = pd.merge(
-    bank_with_factors,
-    inflation,
-    on=["Year", "Month"],
+    bank_combined,
+    inflation_rates,
+    on=["Year","annual_averageinflation"],
     how="left"
 )
 
-# Step 5: Merge with Annual Inflation Factors
+# Step 4: Merge with Annual Inflation Factors
 final_merged = pd.merge(
     bank_with_inflation,
-    annual_factors,
-    on="Year",
+    inflation_affectors,
+    on="indicator_name",
     how="left"
 )
 
-# Step 6: Save the processed dataset
+# Step 5: Save the processed dataset
 final_merged.to_csv("Processed_Bank_Stability_Data.csv", index=False)
 
 # Optional: Show a quick summary

@@ -12,7 +12,7 @@ inflation_affectors = pd.read_csv(r"C:\\Users\\USER\\OneDrive\\Desktop\\Kenyan_B
 
 # Step 2: Combine Bank Stability (assume same columns)
 bank_combined = pd.concat([bank1, bank2], ignore_index=True)
-bank_combined = bank_combined.drop_duplicates (subset=['Year','Factors_affecting_bank_stability']keep='first' inplace=True)
+bank_combined = bank_combined.drop_duplicates (subset=['Year','Factors_affecting_bank_stability'] , keep='first', inplace=True)
 
 #Step 3
 bank_with_inflation = pd.merge(

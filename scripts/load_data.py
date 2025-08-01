@@ -15,14 +15,12 @@ def load_all_data(raw_data_folder="data/raw"):
     # Build full paths to each file
     file_bank1 = os.path.join(raw_data_folder, "Bank_Stability_Analysis.csv")
     file_bank2 = os.path.join(raw_data_folder, "Bank_Stability_Analysis2.csv")
-    file_customer_risk = os.path.join(raw_data_folder, "Customer_Risk_Mapping_Statistics.csv")
     file_inflation_rates = os.path.join(raw_data_folder, "Inflation_Rates.csv")
-    file_inflation_affectors = os.path.join(raw_data_folder, "Inflation_Affectors_Statistics.csv")
+    file_inflation_affectors = os.path.join(raw_data_folder, "Factors_affecting_Inflation.csv")
 
     # Load CSV files into pandas DataFrames
     df_bank1 = pd.read_csv(file_bank1,encoding='ISO-8859-1')
     df_bank2 = pd.read_csv(file_bank2,encoding='ISO-8859-1')
-    df_customer_risk = pd.read_csv(file_customer_risk,encoding='ISO-8859-1')
     df_inflation_rates = pd.read_csv(file_inflation_rates,encoding='ISO-8859-1')
     df_inflation_affectors = pd.read_csv(file_inflation_affectors,encoding='ISO-8859-1')
 
@@ -30,7 +28,6 @@ def load_all_data(raw_data_folder="data/raw"):
     return {
         "bank1": df_bank1,
         "bank2": df_bank2,
-        "customer_risk": df_customer_risk,
         "inflation_rates": df_inflation_rates,
         "inflation_affectors": df_inflation_affectors
     }
